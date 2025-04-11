@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendas - G&M GeekStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        marvel: {
+                            red: '#E23636',
+                            darkRed: '#C11F1F',
+                        }
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-roboto bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-marvel-red shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="index.html" class="text-white text-2xl font-bold">G&M - GeekStore</a>
+                    </div>
+                </div>
+                <div class="flex">
+                    <a href="index.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="estoque.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Estoque</a>
+                    <a href="vendas.html" class="bg-marvel-darkRed text-white px-3 py-2 rounded-md text-sm font-medium">Vendas</a>
+                    <a href="entrada_saida.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Entrada/Saída</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="px-4 py-5 sm:px-6">
+            <h1 class="text-3xl font-bold text-gray-900">Registro de Vendas</h1>
+            <p class="mt-1 text-sm text-gray-500">Realize e acompanhe as vendas da loja</p>
+        </div>
+
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- New Sale Form -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Nova Venda</h2>
+                    <form id="saleForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Produto</label>
+                            <select id="productSelect" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-marvel-red focus:border-marvel-red rounded-md">
+                                <option value="">Selecione um produto</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Quantidade</label>
+                            <input type="number" id="quantity" required min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-marvel-red focus:border-marvel-red">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Preço Unitário</label>
+                            <input type="text" id="unitPrice" readonly class="mt-1 block w-full bg-gray-50 border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Total</label>
+                            <input type="text" id="total" readonly class="mt-1 block w-full bg-gray-50 border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-marvel-red hover:bg-marvel-darkRed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-marvel-red">
+                                Realizar Venda
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Sales History -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Histórico de Vendas</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesHistory" class="bg-white divide-y divide-gray-200">
+                                <!-- Sales history will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Load products and sales on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            loadSalesHistory();
+        });
+
+        function loadProducts() {
+            const products = window.appFunctions.getProducts();
+            const select = document.getElementById('productSelect');
+            
+            // Clear existing options
+            select.innerHTML = '<option value="">Selecione um produto</option>';
+            
+            // Add products to select
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} (Estoque: ${product.stock})`;
+                option.dataset.price = product.price;
+                select.appendChild(option);
+            });
+        }
+
+        function loadSalesHistory() {
+            const sales = JSON.parse(localStorage.getItem('sales')) || [];
+            const products = window.appFunctions.getProducts();
+            const tbody = document.getElementById('salesHistory');
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Add sales to table
+            sales.reverse().forEach(sale => {
+                const product = products.find(p => p.id === sale.productId);
+                if (!product) return;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(sale.date).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${product.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${sale.quantity}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${window.appFunctions.formatCurrency(sale.total)}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update total when quantity or product changes
+        document.getElementById('productSelect').addEventListener('change', updatePrice);
+        document.getElementById('quantity').addEventListener('input', updatePrice);
+
+        function updatePrice() {
+            const select = document.getElementById('productSelect');
+            const quantity = document.getElementById('quantity').value;
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (selectedOption && selectedOption.dataset.price) {
+                const price = parseFloat(selectedOption.dataset.price);
+                document.getElementById('unitPrice').value = window.appFunctions.formatCurrency(price);
+                document.getElementById('total').value = window.appFunctions.formatCurrency(price * quantity);
+            } else {
+                document.getElementById('unitPrice').value = '';
+                document.getElementById('total').value = '';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('saleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('productSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            try {
+                window.appFunctions.makeSale(productId, quantity);
+                window.appFunctions.showAlert('Venda realizada com sucesso!', 'success');
+                this.reset();
+                loadProducts();
+                loadSalesHistory();
+            } catch (error) {
+                window.appFunctions.showAlert(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

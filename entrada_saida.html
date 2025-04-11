@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada/Saída - G&M GeekStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        marvel: {
+                            red: '#E23636',
+                            darkRed: '#C11F1F',
+                        }
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-roboto bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-marvel-red shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="index.html" class="text-white text-2xl font-bold">G&M - GeekStore</a>
+                    </div>
+                </div>
+                <div class="flex">
+                    <a href="index.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    <a href="estoque.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Estoque</a>
+                    <a href="vendas.html" class="text-white hover:bg-marvel-darkRed px-3 py-2 rounded-md text-sm font-medium">Vendas</a>
+                    <a href="entrada_saida.html" class="bg-marvel-darkRed text-white px-3 py-2 rounded-md text-sm font-medium">Entrada/Saída</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="px-4 py-5 sm:px-6">
+            <h1 class="text-3xl font-bold text-gray-900">Movimentação de Estoque</h1>
+            <p class="mt-1 text-sm text-gray-500">Registre entradas e saídas de produtos</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="px-4 sm:px-6">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex" aria-label="Tabs">
+                    <button onclick="switchTab('entrada')" id="entradaTab" class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                        <i class="fas fa-arrow-right-to-bracket mr-2"></i>Entrada
+                    </button>
+                    <button onclick="switchTab('saida')" id="saidaTab" class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm">
+                        <i class="fas fa-arrow-right-from-bracket mr-2"></i>Saída
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="px-4 py-5 sm:px-6">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- Movement Form -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <form id="movementForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Produto</label>
+                            <select id="productSelect" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-marvel-red focus:border-marvel-red rounded-md">
+                                <option value="">Selecione um produto</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Quantidade</label>
+                            <input type="number" id="quantity" required min="1" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-marvel-red focus:border-marvel-red">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Motivo</label>
+                            <input type="text" id="reason" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-marvel-red focus:border-marvel-red" placeholder="Ex: Reposição de estoque">
+                        </div>
+                        <div class="pt-4">
+                            <button type="submit" id="submitButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-marvel-red hover:bg-marvel-darkRed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-marvel-red">
+                                Registrar Entrada
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Transactions History -->
+                <div class="bg-white shadow rounded-lg p-6">
+                    <h2 class="text-lg font-medium text-gray-900 mb-4">Histórico de Movimentações</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produto</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qtd</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Motivo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsHistory" class="bg-white divide-y divide-gray-200">
+                                <!-- Transactions will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        let currentTab = 'entrada';
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            loadTransactions();
+            switchTab('entrada');
+        });
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab styles
+            const entradaTab = document.getElementById('entradaTab');
+            const saidaTab = document.getElementById('saidaTab');
+            
+            if (tab === 'entrada') {
+                entradaTab.classList.add('border-marvel-red', 'text-marvel-red');
+                entradaTab.classList.remove('border-transparent', 'text-gray-500');
+                saidaTab.classList.add('border-transparent', 'text-gray-500');
+                saidaTab.classList.remove('border-marvel-red', 'text-marvel-red');
+                document.getElementById('submitButton').textContent = 'Registrar Entrada';
+            } else {
+                saidaTab.classList.add('border-marvel-red', 'text-marvel-red');
+                saidaTab.classList.remove('border-transparent', 'text-gray-500');
+                entradaTab.classList.add('border-transparent', 'text-gray-500');
+                entradaTab.classList.remove('border-marvel-red', 'text-marvel-red');
+                document.getElementById('submitButton').textContent = 'Registrar Saída';
+            }
+        }
+
+        function loadProducts() {
+            const products = window.appFunctions.getProducts();
+            const select = document.getElementById('productSelect');
+            
+            // Clear existing options
+            select.innerHTML = '<option value="">Selecione um produto</option>';
+            
+            // Add products to select
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.name} (Estoque: ${product.stock})`;
+                select.appendChild(option);
+            });
+        }
+
+        function loadTransactions() {
+            const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+            const products = window.appFunctions.getProducts();
+            const tbody = document.getElementById('transactionsHistory');
+            
+            // Clear existing rows
+            tbody.innerHTML = '';
+            
+            // Add transactions to table
+            transactions.reverse().forEach(transaction => {
+                const product = products.find(p => p.id === transaction.productId);
+                if (!product) return;
+
+                const row = document.createElement('tr');
+                const typeClass = transaction.type === 'entrada' ? 'text-green-600' : 'text-red-600';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${new Date(transaction.date).toLocaleDateString('pt-BR')}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm ${typeClass} font-medium">
+                        ${transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${product.name}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${transaction.quantity}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${transaction.reason}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('movementForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('productSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const reason = document.getElementById('reason').value;
+            
+            try {
+                window.appFunctions.updateStock(productId, quantity, currentTab);
+                window.appFunctions.showAlert('Movimentação registrada com sucesso!', 'success');
+                this.reset();
+                loadProducts();
+                loadTransactions();
+            } catch (error) {
+                window.appFunctions.showAlert(error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
